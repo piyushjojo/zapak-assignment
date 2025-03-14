@@ -50,7 +50,7 @@ public class Player {
 	
 	@ManyToOne
 	@JoinColumn(name="country_cd", nullable=false)
-	private Country countryCd;
+	private Country country;
 	
 	@Column(nullable = false)
 	private String active; 

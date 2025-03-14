@@ -9,7 +9,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PlatformDTO {
-    private Long platformId;
-    private String platformName;
+public class PlayerLeaderBoardDTO {
+
+	private Long playerId;
+    private String username;
+    private Long gameId;
+    private Long score;
+    private String countryCd;
 }

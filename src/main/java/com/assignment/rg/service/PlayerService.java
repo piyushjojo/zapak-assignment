@@ -10,27 +10,36 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.assignment.rg.constants.Constant;
 import com.assignment.rg.dto.CountryDTO;
+import com.assignment.rg.dto.GameDTO;
 import com.assignment.rg.dto.PlatformDTO;
 import com.assignment.rg.dto.PlayerCurrencyDTO;
+import com.assignment.rg.dto.PlayerLeaderBoardDTO;
 import com.assignment.rg.dto.PlayerProgressDTO;
 import com.assignment.rg.dto.PlayerRegistrationDTO;
 import com.assignment.rg.dto.PlayerResponseDTO;
+import com.assignment.rg.dto.PlayerScoreDTO;
 import com.assignment.rg.dto.RankDTO;
 import com.assignment.rg.dto.RewardDTO;
 import com.assignment.rg.entities.Country;
 import com.assignment.rg.entities.Currency;
+import com.assignment.rg.entities.Game;
+import com.assignment.rg.entities.GameType;
 import com.assignment.rg.entities.Platform;
 import com.assignment.rg.entities.Player;
 import com.assignment.rg.entities.PlayerCurrency;
 import com.assignment.rg.entities.PlayerRewards;
+import com.assignment.rg.entities.PlayerScore;
 import com.assignment.rg.entities.Rank;
 import com.assignment.rg.entities.Reward;
 import com.assignment.rg.repository.CountryRepository;
 import com.assignment.rg.repository.CurrencyRepository;
+import com.assignment.rg.repository.GameRepository;
+import com.assignment.rg.repository.GameTypeRepository;
 import com.assignment.rg.repository.PlatformRepository;
 import com.assignment.rg.repository.PlayerCurrencyRepository;
 import com.assignment.rg.repository.PlayerRepository;
 import com.assignment.rg.repository.PlayerRewardsRepository;
+import com.assignment.rg.repository.PlayerScoreRepository;
 import com.assignment.rg.repository.RankRepository;
 import com.assignment.rg.repository.RewardRepository;
 
@@ -62,6 +71,15 @@ public class PlayerService {
 	@Autowired
 	private PlayerRewardsRepository playerRewardRepo;
 	
+	@Autowired
+	private PlayerScoreRepository playerScoreRepo ; 
+	
+	@Autowired
+	private GameRepository gameRepo;
+	
+	@Autowired
+	private GameTypeRepository gameTypeRepo;
+	
 	@Transactional
 	public PlayerResponseDTO registerPlayer(PlayerRegistrationDTO playerRegistrationDTO) {
 		Platform platfrom = platformRepo.findById(playerRegistrationDTO.getPlatformId())
@@ -77,7 +95,7 @@ public class PlayerService {
 				.deviceId(playerRegistrationDTO.getDeviceId())
 				.username(playerRegistrationDTO.getUsername())
 				.platformId(platfrom)
-				.countryCd(country)
+				.country(country)
 				.level(Constant.DIGIT_ONE)
 				.rank(rank)
 				.active(Constant.YES)
@@ -99,7 +117,7 @@ public class PlayerService {
 		if(playerProgressDto.getCountryCd() != null) {
 			Country country = countryRepo.findById(playerProgressDto.getCountryCd())
 					.orElseThrow(() -> new RuntimeException("No such country."));
-			player.setCountryCd(country);
+			player.setCountry(country);
 		}
 		if(playerProgressDto.getLevel() != null) {
 			player.setLevel(playerProgressDto.getLevel());
@@ -126,8 +144,20 @@ public class PlayerService {
 		
 		return buildPlayerResponseDTO(player);
 	}
+	
+	@Transactional
+	public GameDTO createGame() {
+		Game game = Game.builder()
+				.score(0L)
+				.createdAt(LocalDateTime.now())
+				.build();
+		
+		gameRepo.save(game);
+		
+		return GameDTO.builder().gameId(game.getGameId()).score(0L).build();
+	}
 
-	private void addDefaultCurrenciesForCurrentLevel(Player player) {
+	protected void addDefaultCurrenciesForCurrentLevel(Player player) {
 		List<Currency> newCurrencies = currencyRepo.findAll().stream()
 				.filter(currency -> currency.getMinLevelRequired() == player.getLevel())
 				.filter(currency -> currency.getActive() == Constant.YES)
@@ -178,7 +208,45 @@ public class PlayerService {
 		}
 		
 	}
+
+	public void updatePlayerScore(PlayerScoreDTO playerScoreDto) {
+		Player player = playerRepo.findById(playerScoreDto.getPlayerId())
+				.orElseThrow(() -> new RuntimeException("No such player found"));
+		GameType gameType = gameTypeRepo.findById(playerScoreDto.getGameTypeId())
+				.orElseThrow(() -> new RuntimeException("No such game type found"));
+		Game game = gameRepo.findById(playerScoreDto.getGameId())
+				.orElseThrow(() -> new RuntimeException("No such game found"));
+		
+		PlayerScore playerScore = PlayerScore.builder()
+				.player(player)
+				.gameType(gameType)
+				.game(game)
+				.palyedAt(LocalDateTime.now())
+				.build();
+		
+		playerScoreRepo.save(playerScore);
+	}
 	
+	public List<PlayerLeaderBoardDTO> getLeaderboard(String countryCd, int limit, Long gameTypeId){
+		List<PlayerScore> scores ; 
+		
+		if(Constant.ALL.equalsIgnoreCase(countryCd)) {
+			scores = playerScoreRepo.findTopPlayers(limit,gameTypeId);
+		} else {
+			scores = playerScoreRepo.findCountryWiseTopPlayer(countryCd,limit,gameTypeId);
+		}
+		
+		return scores.stream()
+				.map(score -> PlayerLeaderBoardDTO.builder()
+						.playerId(score.getPlayer().getId())
+						.username(score.getPlayer().getUsername())
+						.score(score.getGame().getScore())
+						.countryCd(score.getPlayer().getCountry().getCountryCd())
+						.build())
+				.collect(Collectors.toList());
+		
+	}
+
 	private PlayerResponseDTO buildPlayerResponseDTO(Player player) {
 	    List<PlayerCurrencyDTO> playerCurrencies = playerCurrencyRepo.findByPlayer(player).stream()
 	            .map(pc -> PlayerCurrencyDTO.builder()
@@ -194,6 +262,13 @@ public class PlayerService {
 	                    .rewardName(pr.getReward().getRewardName())
 	                    .build())
 	            .toList();
+	    
+	    List<PlayerScoreDTO> playersScore = playerScoreRepo.findByPlayer(player).stream()
+	    		.map(ps -> PlayerScoreDTO.builder()
+	    				.playerId(ps.getPlayer().getId())
+	    				.gameId(ps.getGame().getGameId())
+	    				.build())
+	    		.toList();
 
 	    return PlayerResponseDTO.builder()
 	            .playerId(player.getId())
@@ -208,8 +283,8 @@ public class PlayerService {
 	                    .platformName(player.getPlatformId().getPlatformName())
 	                    .build())
 	            .country(CountryDTO.builder()
-	                    .countryCd(player.getCountryCd().getCountryCd())
-	                    .countryName(player.getCountryCd().getCountryName())
+	                    .countryCd(player.getCountry().getCountryCd())
+	                    .countryName(player.getCountry().getCountryName())
 	                    .build())
 	            .active(player.getActive())
 	            .lastActive(player.getLastActive())
@@ -217,6 +292,7 @@ public class PlayerService {
 	            .creationDate(player.getCreationDate())
 	            .currencies(playerCurrencies)
 	            .rewards(playerRewards)
+	            .scores(playersScore)
 	            .build();
 	}
 

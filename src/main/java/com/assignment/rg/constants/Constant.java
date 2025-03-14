@@ -7,5 +7,7 @@ public class Constant {
 	public static final String NO = "N";
 
 	public static final long DIGIT_ONE = 1;
+	
+	public static final String ALL = "ALL";
 
 }

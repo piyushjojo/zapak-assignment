@@ -2,15 +2,13 @@ package com.assignment.rg.dto;
 
 import java.time.LocalDateTime;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
+@Data
 @NoArgsConstructor
-@Getter
-@Setter
-@ToString
+@AllArgsConstructor
 public class ApiResponse {
 	private LocalDateTime timeStamp;
 	private String message;
