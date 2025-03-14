@@ -3,6 +3,8 @@ package com.assignment.rg.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.assignment.rg.entities.Game;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,5 +27,5 @@ public class PlayerResponseDTO {
     private LocalDateTime creationDate;
     private List<PlayerCurrencyDTO> currencies;
     private List<RewardDTO> rewards;
-    private List<PlayerScoreDTO> scores;
+    private List<Game> games;
 }

@@ -7,13 +7,11 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class GameDTO {
-	
-	private long gameId;
-	private long playerId ; 
-	private long gameTypeId;
-	private long score;
+@NoArgsConstructor
+public class GameTypeDTO {
+
+    private Long id;
+    private String name ; 
 
 }

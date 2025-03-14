@@ -30,6 +30,10 @@ public class Game {
 	private long gameId ; 
 	
 	@ManyToOne
+    @JoinColumn(name = "player_id", nullable = false)
+    private Player player;
+	
+	@ManyToOne
     @JoinColumn(name = "game_type_id", nullable = false)
 	private GameType gameType;
 	

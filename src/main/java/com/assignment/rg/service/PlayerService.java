@@ -28,7 +28,6 @@ import com.assignment.rg.entities.Platform;
 import com.assignment.rg.entities.Player;
 import com.assignment.rg.entities.PlayerCurrency;
 import com.assignment.rg.entities.PlayerRewards;
-import com.assignment.rg.entities.PlayerScore;
 import com.assignment.rg.entities.Rank;
 import com.assignment.rg.entities.Reward;
 import com.assignment.rg.repository.CountryRepository;
@@ -39,7 +38,6 @@ import com.assignment.rg.repository.PlatformRepository;
 import com.assignment.rg.repository.PlayerCurrencyRepository;
 import com.assignment.rg.repository.PlayerRepository;
 import com.assignment.rg.repository.PlayerRewardsRepository;
-import com.assignment.rg.repository.PlayerScoreRepository;
 import com.assignment.rg.repository.RankRepository;
 import com.assignment.rg.repository.RewardRepository;
 
@@ -70,9 +68,6 @@ public class PlayerService {
 	
 	@Autowired
 	private PlayerRewardsRepository playerRewardRepo;
-	
-	@Autowired
-	private PlayerScoreRepository playerScoreRepo ; 
 	
 	@Autowired
 	private GameRepository gameRepo;
@@ -144,18 +139,6 @@ public class PlayerService {
 		
 		return buildPlayerResponseDTO(player);
 	}
-	
-	@Transactional
-	public GameDTO createGame() {
-		Game game = Game.builder()
-				.score(0L)
-				.createdAt(LocalDateTime.now())
-				.build();
-		
-		gameRepo.save(game);
-		
-		return GameDTO.builder().gameId(game.getGameId()).score(0L).build();
-	}
 
 	protected void addDefaultCurrenciesForCurrentLevel(Player player) {
 		List<Currency> newCurrencies = currencyRepo.findAll().stream()
@@ -171,7 +154,6 @@ public class PlayerService {
 				.collect(Collectors.toList());
 		
 		playerCurrencyRepo.saveAll(playerCurrencies);
-		
 	}
 
 	private void updatedPlayerRewards(Player player, List<Long> updatedReward) {
@@ -187,7 +169,6 @@ public class PlayerService {
 			
 			playerRewardRepo.save(playerReward);
 		}
-		
 	}
 
 	private void updatePlayerCurrency(Player player, List<PlayerCurrencyDTO> updatedCurrency) {
@@ -209,40 +190,41 @@ public class PlayerService {
 		
 	}
 
-	public void updatePlayerScore(PlayerScoreDTO playerScoreDto) {
+	@Transactional
+	public GameDTO updatePlayerScore(PlayerScoreDTO playerScoreDto) {
 		Player player = playerRepo.findById(playerScoreDto.getPlayerId())
 				.orElseThrow(() -> new RuntimeException("No such player found"));
 		GameType gameType = gameTypeRepo.findById(playerScoreDto.getGameTypeId())
 				.orElseThrow(() -> new RuntimeException("No such game type found"));
-		Game game = gameRepo.findById(playerScoreDto.getGameId())
-				.orElseThrow(() -> new RuntimeException("No such game found"));
 		
-		PlayerScore playerScore = PlayerScore.builder()
-				.player(player)
+		Game game = Game.builder().player(player)
 				.gameType(gameType)
-				.game(game)
-				.palyedAt(LocalDateTime.now())
+				.score(playerScoreDto.getScore())
+				.createdAt(playerScoreDto.getTimestamp())
 				.build();
 		
-		playerScoreRepo.save(playerScore);
+		gameRepo.save(game);
+		
+		return GameDTO.builder()
+				.gameId(game.getGameId())
+				.playerId(player.getId())
+				.gameTypeId(gameType.getId())
+				.score(playerScoreDto.getScore())
+				.build();
+		
 	}
 	
 	public List<PlayerLeaderBoardDTO> getLeaderboard(String countryCd, int limit, Long gameTypeId){
-		List<PlayerScore> scores ; 
+		List<Game> games ; 
 		
-		if(Constant.ALL.equalsIgnoreCase(countryCd)) {
-			scores = playerScoreRepo.findTopPlayers(limit,gameTypeId);
+		if(countryCd != null && countryCd.trim().length() > 0 ) {
+			games = gameRepo.findCountryWiseTopPlayer(countryCd,limit,gameTypeId);
 		} else {
-			scores = playerScoreRepo.findCountryWiseTopPlayer(countryCd,limit,gameTypeId);
+			games = gameRepo.findTopPlayers(limit,gameTypeId);
 		}
 		
-		return scores.stream()
-				.map(score -> PlayerLeaderBoardDTO.builder()
-						.playerId(score.getPlayer().getId())
-						.username(score.getPlayer().getUsername())
-						.score(score.getGame().getScore())
-						.countryCd(score.getPlayer().getCountry().getCountryCd())
-						.build())
+		return games.stream()
+				.map(game -> PlayerLeaderBoardDTO.builder().game(game).countryCd(countryCd).build())
 				.collect(Collectors.toList());
 		
 	}
@@ -263,12 +245,7 @@ public class PlayerService {
 	                    .build())
 	            .toList();
 	    
-	    List<PlayerScoreDTO> playersScore = playerScoreRepo.findByPlayer(player).stream()
-	    		.map(ps -> PlayerScoreDTO.builder()
-	    				.playerId(ps.getPlayer().getId())
-	    				.gameId(ps.getGame().getGameId())
-	    				.build())
-	    		.toList();
+	    List<Game> games = gameRepo.findByPlayer(player);
 
 	    return PlayerResponseDTO.builder()
 	            .playerId(player.getId())
@@ -292,7 +269,7 @@ public class PlayerService {
 	            .creationDate(player.getCreationDate())
 	            .currencies(playerCurrencies)
 	            .rewards(playerRewards)
-	            .scores(playersScore)
+	            .games(games)
 	            .build();
 	}
 

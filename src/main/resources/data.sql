@@ -37,3 +37,14 @@ INSERT INTO Reward (reward_name, active) VALUES
 ('Extra Life', 'Y'),
 ('Mystery Box', 'Y');
 
+
+INSERT INTO Game_Type (name) VALUES ('Chess');
+INSERT INTO Game_Type (name) VALUES ('Football');
+INSERT INTO Game_Type (name) VALUES ('Cricket');
+INSERT INTO Game_Type (name) VALUES ('Tennis');
+INSERT INTO Game_Type (name) VALUES ('Pinball');
+INSERT INTO Game_Type (name) VALUES ('Swimming');
+INSERT INTO Game_Type (name) VALUES ('Table Tennis');
+INSERT INTO Game_Type (name) VALUES ('Basketball');
+INSERT INTO Game_Type (name) VALUES ('Racing');
+INSERT INTO Game_Type (name) VALUES ('Shooting');

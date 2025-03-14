@@ -1,5 +1,7 @@
 package com.assignment.rg.dto;
 
+import com.assignment.rg.entities.Game;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,9 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PlayerLeaderBoardDTO {
 
-	private Long playerId;
-    private String username;
-    private Long gameId;
-    private Long score;
+    private Game game;
     private String countryCd;
 }
