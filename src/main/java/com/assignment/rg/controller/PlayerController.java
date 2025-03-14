@@ -22,8 +22,11 @@ import com.assignment.rg.dto.PlayerResponseDTO;
 import com.assignment.rg.dto.PlayerScoreDTO;
 import com.assignment.rg.service.PlayerService;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestController
 @RequestMapping("/player")
+@Slf4j
 public class PlayerController {
 	
 	@Autowired
@@ -36,6 +39,7 @@ public class PlayerController {
 			player = playerService.registerPlayer(playerRegDto);
 			return new ResponseEntity<PlayerResponseDTO>(player, HttpStatus.OK);
 		} catch (Exception e) {
+			log.debug("Exception in register :"+ e.getMessage());
 			return new ResponseEntity<>(new ApiResponse(e.getMessage()), HttpStatus.EXPECTATION_FAILED);
 		}
 	}
@@ -47,6 +51,7 @@ public class PlayerController {
 			player = playerService.updatePlayerProgress(playerProgressDto);
 			return new ResponseEntity<PlayerResponseDTO>(player, HttpStatus.OK);
 		} catch (Exception e) {
+			log.debug("Exception in updatePlayerProgress :"+ e.getMessage());
 			return new ResponseEntity<>(new ApiResponse(e.getMessage()), HttpStatus.EXPECTATION_FAILED);
 		}
 	}
@@ -57,6 +62,7 @@ public class PlayerController {
 			GameDTO gameDto = playerService.updatePlayerScore(playerScoreDto);
 			return new ResponseEntity<GameDTO>(gameDto, HttpStatus.OK);
 		} catch (Exception e) {
+			log.debug("Exception in submitScore :"+ e.getMessage());
 			return new ResponseEntity<>(new ApiResponse(e.getMessage()), HttpStatus.EXPECTATION_FAILED);
 		}
 	}
@@ -68,6 +74,7 @@ public class PlayerController {
 			List<PlayerLeaderBoardDTO> leaderBoardDto = playerService.getLeaderboard(countryCd, limit,gameTypeId);
 			return new ResponseEntity<List<PlayerLeaderBoardDTO>>(leaderBoardDto,HttpStatus.OK);
 		} catch (Exception e) {
+			log.debug("Exception in getLeaderboard :"+ e.getMessage());
 			return new ResponseEntity<>(new ApiResponse(e.getMessage()), HttpStatus.EXPECTATION_FAILED);
 		}
 	}
