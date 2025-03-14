@@ -1,0 +1,272 @@
+{
+	"info": {
+		"_postman_id": "4a7f9ec1-c165-4a5c-939e-48724f8aa072",
+		"name": "Reliance Games",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31314341"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"Piyush\",\r\n  \"deviceId\": \"12345-ABCDE\",\r\n  \"platformId\": 1,\r\n  \"countryCd\": \"IN\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/player/register",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"player",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Progress",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"playerId\": 1,\r\n    \"level\": 5,\r\n    \"rankId\": 2,\r\n    \"countryCd\": \"US\",\r\n    \"lastActive\": \"2025-03-13T12:30:45\",\r\n    \"rewardIds\": [1, 2, 3],\r\n    \"currencies\": [\r\n        {\r\n            \"currencyId\": 1,\r\n            \"amount\": 1000\r\n        },\r\n        {\r\n            \"currencyId\": 2,\r\n            \"amount\": 500\r\n        },\r\n        {\r\n            \"currencyId\": 3,\r\n            \"amount\": 500\r\n        }\r\n    ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/player/updateProgress",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"player",
+						"updateProgress"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Submit Score",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"playerId\": 1,\r\n  \"gameTypeId\": 1,\r\n  \"score\": 12100,\r\n  \"timestamp\": \"2025-03-13T14:30:00\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/player/submitScore",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"player",
+						"submitScore"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Global leaderboard",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/player/leaderboard?gameTypeId=1&limit=10",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"player",
+						"leaderboard"
+					],
+					"query": [
+						{
+							"key": "gameTypeId",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Countrywise LeaderBoard",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/player/leaderboard?gameTypeId=1&countryCd=US&limit=10",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"player",
+						"leaderboard"
+					],
+					"query": [
+						{
+							"key": "gameTypeId",
+							"value": "1"
+						},
+						{
+							"key": "countryCd",
+							"value": "US"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event Schedule",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventName\": \"Spring Tournament\",\r\n    \"gameTypeId\": 1,\r\n    \"startTime\": \"2024-04-01T10:00:00\",\r\n    \"endTime\": \"2026-04-05T20:00:00\",\r\n    \"status\": \"SCHEDULED\",\r\n    \"eventConfig\": {\r\n        \"rewards\": [\r\n            {\r\n                \"rewardId\": 1,\r\n                \"rewardName\": \"Gold Medal\",\r\n                \"active\": \"Y\"\r\n            },\r\n            {\r\n                \"rewardId\": 2,\r\n                \"rewardName\": \"500 Gems\",\r\n                \"active\": \"Y\"\r\n            }\r\n        ],\r\n        \"minRankRequired\": 5,\r\n        \"minLevelRequired\": 10,\r\n        \"maxParticipants\": 100\r\n    }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/events/schedule",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"events",
+						"schedule"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Event Update",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventName\": \"Updated Spring Tournament\",\r\n    \"gameTypeId\": 1,\r\n    \"startTime\": \"2024-04-02T12:00:00\",\r\n    \"endTime\": \"2026-04-06T18:00:00\",\r\n    \"status\": \"ONGOING\",\r\n    \"eventConfig\": {\r\n        \"rewards\": [\r\n            {\r\n                \"rewardId\": 1,\r\n                \"rewardName\": \"Platinum Medal\",\r\n                \"active\": \"Y\"\r\n            },\r\n            {\r\n                \"rewardId\": 3,\r\n                \"rewardName\": \"1000 Gems\",\r\n                \"active\": \"Y\"\r\n            }\r\n        ],\r\n        \"minRankRequired\": 10,\r\n        \"minLevelRequired\": 15,\r\n        \"maxParticipants\": 150\r\n    }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/events/update/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"events",
+						"update",
+						"1"
+					],
+					"query": [
+						{
+							"key": "eventId",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Available Events",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventName\": \"Spring Tournament\",\r\n    \"gameTypeId\": 1,\r\n    \"startTime\": \"2025-04-01T10:00:00\",\r\n    \"endTime\": \"2025-04-05T20:00:00\",\r\n    \"status\": \"SCHEDULED\",\r\n    \"eventConfig\": {\r\n        \"rewards\": [\r\n            {\r\n                \"rewardId\": 1,\r\n                \"rewardName\": \"Gold Medal\",\r\n                \"active\": \"Y\"\r\n            },\r\n            {\r\n                \"rewardId\": 2,\r\n                \"rewardName\": \"500 Gems\",\r\n                \"active\": \"Y\"\r\n            }\r\n        ],\r\n        \"minRankRequired\": 5,\r\n        \"minLevelRequired\": 10,\r\n        \"maxParticipants\": 100\r\n    }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/events/availableEvents",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"events",
+						"availableEvents"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
