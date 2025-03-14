@@ -30,6 +30,7 @@ import com.assignment.rg.entities.PlayerCurrency;
 import com.assignment.rg.entities.PlayerRewards;
 import com.assignment.rg.entities.Rank;
 import com.assignment.rg.entities.Reward;
+import com.assignment.rg.exception.ResourceNotFoundException;
 import com.assignment.rg.repository.CountryRepository;
 import com.assignment.rg.repository.CurrencyRepository;
 import com.assignment.rg.repository.GameRepository;
@@ -82,13 +83,13 @@ public class PlayerService {
 	public PlayerResponseDTO registerPlayer(PlayerRegistrationDTO playerRegistrationDTO) {
 		try {
 			Platform platfrom = platformRepo.findById(playerRegistrationDTO.getPlatformId())
-					.orElseThrow(() -> new RuntimeException("This Platform does not exist."));
+					.orElseThrow(() -> new ResourceNotFoundException("Platform not found."));
 			
 			Country country = countryRepo.findById(playerRegistrationDTO.getCountryCd())
-					.orElseThrow(() -> new RuntimeException("No such country exist."));
+					.orElseThrow(() -> new ResourceNotFoundException("Country not found."));
 			
 			Rank rank = rankRepo.findById(Constant.DIGIT_ONE)
-					.orElseThrow(()-> new RuntimeException("No Such Rank Exist."));
+					.orElseThrow(()-> new ResourceNotFoundException("Rank not found."));
 			
 			Player player = Player.builder()
 					.deviceId(playerRegistrationDTO.getDeviceId())
@@ -116,11 +117,11 @@ public class PlayerService {
 	public PlayerResponseDTO updatePlayerProgress(PlayerProgressDTO playerProgressDto) {
 		try {
 			Player player = playerRepo.findById(playerProgressDto.getPlayerId())
-					.orElseThrow(()-> new RuntimeException("No such plyer found"));
+					.orElseThrow(()-> new ResourceNotFoundException("No such plyer found"));
 			
 			if(playerProgressDto.getCountryCd() != null) {
 				Country country = countryRepo.findById(playerProgressDto.getCountryCd())
-						.orElseThrow(() -> new RuntimeException("No such country."));
+						.orElseThrow(() -> new ResourceNotFoundException("No such country."));
 				player.setCountry(country);
 			}
 			if(playerProgressDto.getLevel() != null) {
@@ -128,7 +129,7 @@ public class PlayerService {
 			}
 			if(playerProgressDto.getRankId() != null) {
 				Rank rank = rankRepo.findById(playerProgressDto.getRankId())
-						.orElseThrow(() -> new RuntimeException("No such rank."));
+						.orElseThrow(() -> new ResourceNotFoundException("No such rank."));
 				player.setRank(rank);
 			}
 			if(playerProgressDto.getLastActive() != null) {
@@ -180,7 +181,7 @@ public class PlayerService {
 		try {
 			for (Long rewardId : updatedReward) { 
 			    Reward reward = rewardRepo.findById(rewardId)
-			            .orElseThrow(() -> new RuntimeException("No such reward found with ID: " + rewardId));
+			            .orElseThrow(() -> new ResourceNotFoundException("No such reward found with ID: " + rewardId));
 		
 				PlayerRewards playerReward = PlayerRewards.builder()
 						.player(player)
@@ -201,7 +202,7 @@ public class PlayerService {
 		try {
 			for(PlayerCurrencyDTO curr : updatedCurrency) {
 				Currency currency = currencyRepo.findById(curr.getCurrencyId())
-						.orElseThrow(() -> new RuntimeException("No currency found"));
+						.orElseThrow(() -> new ResourceNotFoundException("No currency found"));
 				
 				PlayerCurrency playerCurrency = playerCurrencyRepo.findByPlayerAndCurrency(player,currency)
 						.orElse(PlayerCurrency.builder()
@@ -224,9 +225,9 @@ public class PlayerService {
 	public GameDTO updatePlayerScore(PlayerScoreDTO playerScoreDto) {
 		try {
 			Player player = playerRepo.findById(playerScoreDto.getPlayerId())
-					.orElseThrow(() -> new RuntimeException("No such player found"));
+					.orElseThrow(() -> new ResourceNotFoundException("No such player found"));
 			GameType gameType = gameTypeRepo.findById(playerScoreDto.getGameTypeId())
-					.orElseThrow(() -> new RuntimeException("No such game type found"));
+					.orElseThrow(() -> new ResourceNotFoundException("No such game type found"));
 			
 			Game game = Game.builder().player(player)
 					.gameType(gameType)

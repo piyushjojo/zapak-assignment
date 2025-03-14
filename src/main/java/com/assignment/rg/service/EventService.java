@@ -15,6 +15,7 @@ import com.assignment.rg.entities.EventConfig;
 import com.assignment.rg.entities.GameEvent;
 import com.assignment.rg.entities.GameType;
 import com.assignment.rg.entities.Reward;
+import com.assignment.rg.exception.ResourceNotFoundException;
 import com.assignment.rg.repository.EventConfigRepository;
 import com.assignment.rg.repository.GameEventRepository;
 import com.assignment.rg.repository.GameTypeRepository;
@@ -43,7 +44,7 @@ public class EventService {
     public GameEventResponseDTO scheduleGameEvent(GameEventDTO gameEvenntDto) {
 		try {
 			GameType gameType = gameTypeRepo.findById(gameEvenntDto.getGameTypeId())
-	                .orElseThrow(() -> new RuntimeException("GameType not found"));
+	                .orElseThrow(() -> new ResourceNotFoundException("GameType not found"));
 
 	        GameEvent gameEvent = GameEvent.builder()
 	                .eventName(gameEvenntDto.getEventName())
@@ -81,7 +82,7 @@ public class EventService {
     public GameEventResponseDTO updateGameEvent(Long eventId, GameEventDTO gameEventDto) {
     	try {
     		GameEvent gameEvent = gameEventRepo.findById(eventId)
-                    .orElseThrow(() -> new RuntimeException("Game Event not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Game Event not found"));
 
             gameEvent.setEventName(gameEventDto.getEventName());
             gameEvent.setStartTime(gameEventDto.getStartTime());
@@ -91,7 +92,7 @@ public class EventService {
             GameEvent updatedEvent = gameEventRepo.save(gameEvent);
 
             EventConfig eventConfig = eventConfigRepo.findByGameEventId(updatedEvent.getId())
-                    .orElseThrow(() -> new RuntimeException("EventConfig not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("EventConfig not found"));
 
             eventConfig.setRewards(gameEventDto.getEventConfig().getRewards());
             eventConfig.setMinLevelRequired(gameEventDto.getEventConfig().getMinLevelRequired());
@@ -114,7 +115,7 @@ public class EventService {
     	try {
     		return gameEventRepo.findValidEvents(LocalDateTime.now()).stream()
                     .map(event -> getGameEventResponseDTO(event, eventConfigRepo.findByGameEventId(event.getId())
-                            .orElseThrow(() -> new RuntimeException("EventConfig not found"))))
+                            .orElseThrow(() -> new ResourceNotFoundException("EventConfig not found"))))
                     .collect(Collectors.toList());
 		} catch (Exception e) {
 			log.debug("exception in scheduleGameEvent : " + e.getMessage());
